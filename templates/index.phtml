@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<head>
+    <title>Task</title>
+    <script src="/js/jquery-3.3.1.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="/js/main.js"></script>
+</head>
+<body
+<div class="row">
+<div class="col-md-6">
+        <h4>Создание периода действия скидки на товар</h4>
+        <h5>Пожалуйста, заполните все поля</h5>
+<form>
+    
+ <div class="form-group">
+    <label>Выберите продукт</label>
+    <select id="product" class="form-control">
+        <option value="">Выберите продукт</option>
+        <?php foreach ($products as $productItem): ?>
+        <option value="<?php echo $productItem['id']; ?>"><?php echo $productItem['name']; ?></option>
+        <?php endforeach; ?>
+    </select>
+</div>
+
+<div class="form-group">
+    <label>Введите дату начала скидки</label>
+    <input type="date" required="required" id="first_date" class="form-control">
+</div>
+
+<div class="form-group">
+    <label>Введите дату окончания скидки</label>
+    <input type="date" required="required" id="last_date" class="form-control">
+</div>
+
+<div class="form-group">
+    <label>Укажите цену на время действия скидки</label>
+    <input type="text" required="required" id="discount_price" class="form-control">
+</div>
+<div class="form-group">
+    <input id = "submit" type="button" class="btn btn-default" value ="Сохранить">
+</div>
+</form>
+</div>
+
+
+    <div class="col-md-6">
+    <h4>Выберите товар, для определения цены</h4>
+<form>
+    <div class="form-group">
+        <label>Выберите продукт</label>
+        <select id="prod" class="form-control">
+            <option value="">Выберите продукт</option>
+            <?php foreach ($products as $productItem): ?>
+            <option value="<?php echo $productItem['id']; ?>"><?php echo $productItem['name']; ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+
+<div class="form-group">
+    <label>Введите дату</label>
+    <input type="date" id="date" class="form-control">
+</div>
+
+<div class="form-group">
+    <input id = "method1" type="button" class="btn btn-default" value ="Цена - метод 1">
+    <input id = "method2" type="button" class="btn btn-default" value ="Цена - метод 2">
+</div>
+    <p>Цена выбранного продукта: </p>
+    <p id="result"></p>
+    
+</form>
+</div>
+</div>
+               
+</body>
