@@ -36,10 +36,13 @@ $(document).ready(function(){
             type: 'POST',
             data: {
                 prod_id: $("#prod").val(),
-                date: $("#date").val()
+                date: $("#date").val()    
             },
             success: function (data){
             alert(data);
+            for (var key in data) {
+            $("#result").empty().text(data[key].price);
+            }
             }
             });
         });

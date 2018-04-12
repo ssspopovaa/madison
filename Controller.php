@@ -48,7 +48,7 @@ class Controller
     }
         // Return json with actual price method 1
 
-    public function Method1Action()
+    public function method1Action()
     {
         $prod_id = intval($_POST['prod_id']);
         $date= strtotime($_POST['date']);
@@ -68,12 +68,23 @@ class Controller
     }
     
  // Return json with actual price method 2
-    public function Method2Action()
+    public function method2Action()
     {
-        $product_id= intval($_POST['prod_id']);
+        $prod_id = intval($_POST['prod_id']);
         $date= strtotime($_POST['date']);
-        echo "$date.'+'.$product_id";
+        
+        $sql = models::getPrice($prod_id);
+        header('Content-Type: application/json');
+        $result = $sql->fetchAll(PDO::FETCH_ASSOC);
 
+        $sql_discount = models::getDiscountPrice2($prod_id,$date);
+        
+        if ($sql_discount->rowCount()>0){
+         //   header('Content-Type: application/json');
+        $result = $sql_discount->fetchAll(PDO::FETCH_ASSOC);
+        }
+        return json_encode($result);
+        
     }
 
 }
