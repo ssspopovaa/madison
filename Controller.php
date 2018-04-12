@@ -1,8 +1,8 @@
 <?php
-
+include_once './models/models.php';
 class Controller
 {
-    protected $db;
+    public $db;
 
     /**
      * Controller constructor.
@@ -18,7 +18,7 @@ class Controller
         $this->db->exec('set names utf8');
         
     }
-        //Загрузка стартовой страницы
+        //Load start page with product list
     
     public function indexAction()
     {
@@ -30,7 +30,7 @@ class Controller
         require_once 'templates/index.phtml';
         
     }
-        // Данный метод добавляет данные в таблицу "discount"
+        // Add data to table "discount"
     public function discountAction()
     {
         $product_id= intval($_POST['product_id']);
@@ -46,42 +46,34 @@ class Controller
         if ($result){echo "Период действия скидки добавлен в базу данных";}
         else {echo 'Что-то пошло не так. Возможно Вы не заполнили какое-то поле';}
     }
-//        $sth = $this->db->prepare('insert `id`, (select name from offers where id = offer_id) AS name, `price`, `count`, (select name from operators where id = operator_id) AS oper FROM `requests` WHERE count >2 and (operator_id = 10 or operator_id = 12)');
-//        
-//        $sth->execute();
-//        header('Content-Type: application/json');
-//        return json_encode($sth->fetchAll(PDO::FETCH_ASSOC));
-//    }
-    
-        // Определение цены товара по первому методу
+        // Return json with actual price method 1
+
     public function Method1Action()
     {
         $prod_id = intval($_POST['prod_id']);
         $date= strtotime($_POST['date']);
-                
-        $sql = $this->db->query('SELECT `price` FROM `discount` WHERE prod_id = '.$prod_id
-         .' and ('.$date.' between first_date and last_date)');
-        if (!empty($sql)){
-            header('Content-Type: json');
-        return json_encode($sql->fetchAll(PDO::FETCH_ASSOC));            
-        }else{
-             $sql = $this->db->query('SELECT `price` FROM `products` WHERE `id` = '.$prod_id);
-             header('Content-Type: json');
-        return json_encode($sql->fetchAll(PDO::FETCH_ASSOC));
-        }
+        
+        $sql = models::getPrice($prod_id);
+        header('Content-Type: application/json');
+        $result = $sql->fetchAll(PDO::FETCH_ASSOC);
 
+        $sql_discount = models::getDiscountPrice($prod_id,$date);
+        
+        if ($sql_discount->rowCount()>0){
+         //   header('Content-Type: application/json');
+        $result = $sql_discount->fetchAll(PDO::FETCH_ASSOC);
+        }
+        return json_encode($result);
+           
     }
     
- // Определение цены товара по первому методу
+ // Return json with actual price method 2
     public function Method2Action()
     {
         $product_id= intval($_POST['prod_id']);
         $date= strtotime($_POST['date']);
         echo "$date.'+'.$product_id";
-//        $sth = $this->db->prepare('SELECT (select name from offers where id = offer_id) AS name, `count`, (`count` * `price`) AS sum FROM `requests` GROUP by name');
-//        $sth->execute();
-//        header('Content-Type: application/json');
-//        return json_encode($sth->fetchAll(PDO::FETCH_ASSOC));
+
     }
 
 }
