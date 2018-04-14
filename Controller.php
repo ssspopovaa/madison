@@ -86,5 +86,33 @@ class Controller
         return json_encode($result);
         
     }
+    public function chartAction() {
+        $chart_id = intval($_POST['chart_id']); //product id
+        $chart_f= strtotime($_POST['chart_f']); //first date
+        $chart_l= strtotime($_POST['chart_l']); //last date
+        
+        $i = 0;
+        $j = 60*60*24;
+        
+        $date = $chart_f;
+        
+        do{
+        $sql = models::getPrice($chart_id);
+        //header('Content-Type: application/json');
+        $result[$date][$i] = $sql->fetchAll(PDO::FETCH_ASSOC);
 
+        $sql_discount = models::getDiscountPrice($chart_id,$date);
+        
+        if ($sql_discount->rowCount()>0){
+         //   header('Content-Type: application/json');
+        $result[$date][$i] = $sql_discount->fetchAll(PDO::FETCH_ASSOC);
+        }
+            $i++;
+            $date = intval($date) + intval($j);
+        }
+        while ($date <= $chart_l);
+        //header('Content-Type: application/json');
+        return $result;
+            
+   }
 }

@@ -46,4 +46,37 @@ $(document).ready(function(){
             }
             });
         });
+        $("#chart").on('click', function () {
+        $.ajax({
+            url: '/chart',
+            type: 'POST',
+            data: {
+                chart_id: $("#chart_prod").val(),
+                chart_f: $("#chart_f").val(),
+                chart_l: $("#chart_l").val()
+            },
+            success: function (data){
+            
+            alert(data);
+            for (var key in data) {
+            alert(data[key].price);
+                       
+            }
+                new Chartist.Line('.chart1', {
+                labels: ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница'],
+                series: [
+                          [12, 9, 3, 8, 4],
+                          [2, 1, 4.7, 5.5, 8]
+                        ]
+            }, {
+            fullWidth: true,
+            chartPadding: {
+            right: 50
+            }
+            }); 
+            
+
+            }
+            });
+        });
  });
