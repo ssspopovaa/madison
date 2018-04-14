@@ -56,19 +56,18 @@ $(document).ready(function(){
                 chart_l: $("#chart_l").val()
             },
             success: function (data){
-            
-            alert(data);
+            var series = [];
+            var labels = [];
             for (var key in data) {
-            alert(data[key].price);
-                       
+                series[key] = (data[key].price);
+                labels[key] = (data[key].date);
             }
+            
+            
                 new Chartist.Line('.chart1', {
-                labels: ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница'],
-                series: [
-                          [12, 9, 3, 8, 4],
-                          [2, 1, 4.7, 5.5, 8]
-                        ]
-            }, {
+                labels: labels,
+                series: [series]
+                }, {
             fullWidth: true,
             chartPadding: {
             right: 50

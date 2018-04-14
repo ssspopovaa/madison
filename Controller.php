@@ -92,27 +92,32 @@ class Controller
         $chart_l= strtotime($_POST['chart_l']); //last date
         
         $i = 0;
-        $j = 60*60*24;
+        $j = 3600*24; //1 day step
         
         $date = $chart_f;
-        
-        do{
-        $sql = models::getPrice($chart_id);
-        //header('Content-Type: application/json');
-        $result[$date][$i] = $sql->fetchAll(PDO::FETCH_ASSOC);
+        $result = [];
+        do {
+            $sql = $this->db->prepare('SELECT `price` FROM `discount` WHERE prod_id = '.$chart_id
+             .' and ('.$date.' between first_date and last_date) ORDER BY `period` LIMIT 1');
+            $sql->execute();
 
-        $sql_discount = models::getDiscountPrice($chart_id,$date);
-        
-        if ($sql_discount->rowCount()>0){
-         //   header('Content-Type: application/json');
-        $result[$date][$i] = $sql_discount->fetchAll(PDO::FETCH_ASSOC);
-        }
+            $prices = array_shift($sql->fetchAll(PDO::FETCH_ASSOC));
+            $result[$i]['price'] = $prices['price']; 
+                
+            if (!count($result[$i]['price'])) {
+                $sql = $this->db->prepare('SELECT * FROM `products` WHERE `id` = '.$chart_id);
+                $sql->execute();
+                $prices = array_shift($sql->fetchAll(PDO::FETCH_ASSOC));
+                $result[$i]['price'] = $prices['price']; 
+            }
+
+            $result[$i]['date'] = $date;
+            
             $i++;
             $date = intval($date) + intval($j);
-        }
-        while ($date <= $chart_l);
-        //header('Content-Type: application/json');
-        return $result;
-            
+        } while ($date <= $chart_l);
+        
+        header('Content-Type: application/json');
+        return json_encode($result);    
    }
 }

@@ -1,6 +1,6 @@
 <?php
 
-class models{
+class models extends Controller {
     
     public function getDiscountPrice($prod_id,$date){
                        
