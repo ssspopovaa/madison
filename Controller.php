@@ -2,7 +2,7 @@
 include_once './models/models.php';
 class Controller
 {
-    public $db;
+    protected $db;
 
     /**
      * Controller constructor.
@@ -34,15 +34,16 @@ class Controller
     public function discountAction()
     {
         $product_id= intval($_POST['product_id']);
-        $first_date= strtotime($_POST['first_date']);
-        $last_date= strtotime($_POST['last_date']);
+        $first_date= strtotime($_POST['first_date']); // unix time
+        $last_date= strtotime($_POST['last_date']);   // unix time
         $discount_price=$_POST['discont_price'];
-        $period = ($last_date-$first_date)/3600/24;
+        $period = ($last_date-$first_date)/3600/24; //count days
         $date_added = time();
         
         $sql = $this->db->prepare('insert into discount(prod_id,first_date,last_date,period,date_added,price)'
                .'VALUES ('.$product_id.','.$first_date.','.$last_date.','.$period.','.$date_added.','.$discount_price.')');
         $result = $sql->execute();
+        
         if ($result){echo "Период действия скидки добавлен в базу данных";}
         else {echo 'Что-то пошло не так. Возможно Вы не заполнили какое-то поле';}
     }
@@ -60,7 +61,8 @@ class Controller
         $sql_discount = models::getDiscountPrice($prod_id,$date);
         
         if ($sql_discount->rowCount()>0){
-         //   header('Content-Type: application/json');
+        
+        //header('Content-Type: application/json');
         $result = $sql_discount->fetchAll(PDO::FETCH_ASSOC);
         }
         return json_encode($result);
@@ -80,8 +82,8 @@ class Controller
         $sql_discount = models::getDiscountPrice2($prod_id,$date);
         
         if ($sql_discount->rowCount()>0){
-         //   header('Content-Type: application/json');
-        $result = $sql_discount->fetchAll(PDO::FETCH_ASSOC);
+            header('Content-Type: application/json');
+            $result = $sql_discount->fetchAll(PDO::FETCH_ASSOC);
         }
         return json_encode($result);
         
@@ -97,27 +99,42 @@ class Controller
         $date = $chart_f;
         $result = [];
         do {
+            //get price for method 1
             $sql = $this->db->prepare('SELECT `price` FROM `discount` WHERE prod_id = '.$chart_id
              .' and ('.$date.' between first_date and last_date) ORDER BY `period` LIMIT 1');
             $sql->execute();
 
+            //get price for method 2
+            $sql2 = $this->db->prepare('SELECT `price` FROM `discount` WHERE prod_id = '.$chart_id
+             .' and ('.$date.' between first_date and last_date) ORDER BY `date_added` DESC LIMIT 1');
+
+            $sql2->execute();
+
+            
             $prices = array_shift($sql->fetchAll(PDO::FETCH_ASSOC));
-            $result[$i]['price'] = $prices['price']; 
+            $prices2 = array_shift($sql2->fetchAll(PDO::FETCH_ASSOC));
+            $result[$i]['price'] = $prices['price'];
+            $result[$i]['price2'] = $prices2['price'];
                 
             if (!count($result[$i]['price'])) {
+                // get default price
                 $sql = $this->db->prepare('SELECT * FROM `products` WHERE `id` = '.$chart_id);
                 $sql->execute();
                 $prices = array_shift($sql->fetchAll(PDO::FETCH_ASSOC));
-                $result[$i]['price'] = $prices['price']; 
+                $prices2 = $prices;
+                
+                $result[$i]['price'] = $prices['price'];
+                $result[$i]['price2'] = $prices2['price'];
             }
 
-            $result[$i]['date'] = $date;
+            $result[$i]['date'] = date("d:m:Y",$date);
             
             $i++;
             $date = intval($date) + intval($j);
         } while ($date <= $chart_l);
         
         header('Content-Type: application/json');
-        return json_encode($result);    
+        return json_encode($result);
+        
    }
 }

@@ -23,7 +23,6 @@ $(document).ready(function(){
                 date: $("#date").val()    
             },
             success: function (data){
-            alert(data);
             for (var key in data) {
             $("#result").empty().text(data[key].price);
             }
@@ -39,12 +38,11 @@ $(document).ready(function(){
                 date: $("#date").val()    
             },
             success: function (data){
-            alert(data);
-            for (var key in data) {
-            $("#result").empty().text(data[key].price);
+                for (var key in data) {
+                $("#result").empty().text(data[key].price);
+                }
             }
-            }
-            });
+        });
         });
         $("#chart").on('click', function () {
         $.ajax({
@@ -56,17 +54,28 @@ $(document).ready(function(){
                 chart_l: $("#chart_l").val()
             },
             success: function (data){
-            var series = [];
+            var series1 = [];
+            var series2 = [];
             var labels = [];
-            for (var key in data) {
-                series[key] = (data[key].price);
-                labels[key] = (data[key].date);
-            }
             
+            //get X elements first method chart
+            var series1 = data.map(function(item) {
+                         return item.price;
+                        });
+                        
+            //get X elements first method chart
+            var series2 = data.map(function(item) {
+                         return item.price2;
+                        });
             
-                new Chartist.Line('.chart1', {
+            //get Y elements both charts
+            var labels = data.map(function(item) {
+                        return item.date;
+                        });
+            
+            new Chartist.Line('.chart1', {
                 labels: labels,
-                series: [series]
+                series: [series1,series2]
                 }, {
             fullWidth: true,
             chartPadding: {
